@@ -1,0 +1,16 @@
+#%Module1.0######################################################################
+##
+## Rocm module
+##
+
+module-whatis   "adds `@CPACK_PACKAGING_INSTALL_PREFIX@/bin' to your PATH environment variable"
+
+proc ModulesHelp { } {
+    puts stderr "\tThe ROCM Module."
+}
+
+
+prepend-path PATH "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@:@CPACK_PACKAGING_INSTALL_PREFIX@/llvm/bin:@CPACK_PACKAGING_INSTALL_PREFIX@/opencl/bin"
+prepend-path CMAKE_PREFIX_PATH "@CPACK_PACKAGING_INSTALL_PREFIX@"
+setenv ROCM_PATH "@CPACK_PACKAGING_INSTALL_PREFIX@"
+setenv HIP_PATH "@CPACK_PACKAGING_INSTALL_PREFIX@/hip"
