@@ -39,7 +39,8 @@ do_update_alternatives(){
     do
        if [ -d "$loc" ]
        then
-           update-alternatives --install "$loc/rocmmod@ROCM_VERSION@" "rocmod@ROCM_VERSION@" "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/rocmmod" "$altscore"
+           mkdir -p "$loc/rocm"
+           update-alternatives --install "$loc/rocm/@ROCM_VERSION@" "rocmmod@ROCM_VERSION@" "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/rocmmod" "$altscore"
            break;
        fi
     done
