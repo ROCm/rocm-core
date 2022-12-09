@@ -5,7 +5,7 @@ do_update_alternatives(){
     command -v update-alternatives >/dev/null || return 0
     # Update the /opt/rocm symlink
     update-alternatives --remove "rocm" "@CPACK_PACKAGING_INSTALL_PREFIX@"
-    update-alternatives --remove "rocmod@ROCM_VERSION@" "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/rocmmod"|| true
+    update-alternatives --remove "rocmmod@ROCM_VERSION@" "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/rocmmod"|| true
 }
 
 if [ -e /etc/lsb-release ] && source /etc/lsb-release && [ "$DISTRIB_ID" = "Ubuntu" ]
