@@ -53,10 +53,10 @@ extern "C" {
 #define LIB_API_PUBLIC __attribute__ ((visibility ("default")))
 
 
+#define ROCM_VERSION_MAJOR   @VERSION_MAJOR@
+#define ROCM_VERSION_MINOR   @VERSION_MINOR@
+#define ROCM_VERSION_PATCH   @VERSION_PATCH@
 
-#define ROCM_VERSION_MAJOR   1
-#define ROCM_VERSION_MINOR   0
-#define ROCM_VERSION_PATCH   0
 #define ROCM_BUILD_INFO	     "@PACKAGE_BUILD_INFO@"
 
 typedef enum {

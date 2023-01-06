@@ -51,29 +51,21 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 include( utils.cmake )
 include( GNUInstallDirs )
 
+#Parse Version
+message( STATUS "ROCM_VERSION = ${ROCM_VERSION}" )
+parse_rocm_version( ${ROCM_VERSION} )
+
 set( CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm" CACHE PATH "default cpack directory" )
 set( BUILD_SHARED_LIBS ON CACHE BOOL "Build shared library (.so) or not." )
 set( CPACK_GENERATOR "TGZ;DEB;RPM" CACHE STRING "package types to be produced " )
 set( COPYRIGHT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/copyright"  )
 set( BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR} )
 
-if( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/rocm_version.h.in )
-  file( READ "${CMAKE_CURRENT_SOURCE_DIR}/rocm_version.h.in" VER )
-
-  string( REGEX MATCH "ROCM_VERSION_MAJOR   ([0-9]*)" _ ${VER} )
-  set( ROCM_VERSION ${CMAKE_MATCH_1} )
-  string( REGEX MATCH "ROCM_VERSION_MINOR   ([0-9]*)" _ ${VER} )
-  set( ROCM_VERSION "${ROCM_VERSION}.${CMAKE_MATCH_1}" )
-  string( REGEX MATCH "ROCM_VERSION_PATCH   ([0-9]*)" _ ${VER} )
-  set( ROCM_VERSION "${ROCM_VERSION}.${CMAKE_MATCH_1}" )
-  message( STATUS "ROCM_VERSION = ${ROCM_VERSION}" )
-else()
-  message( FATAL_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/rocm_version.h.in does not exists." )
-endif()
-
-## Set the version
-parse_rocm_version( ${ROCM_VERSION} )
+## Set variables
 set_variables()
+
+set( SO_MAJOR "1")
+set( SO_MINOR "0" )
 
 if( NOT DEFINED BUILD_ID )
   set( BUILD_ID "9999")
@@ -97,10 +89,9 @@ set( CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} "-Wl,-z,nodelete -Wl
 target_include_directories( ${CORE_TARGET} PRIVATE ${BUILD_DIR} )
 
 ## Set the VERSION and SOVERSION values
-set( PATCH_STRING "${VERSION_PATCH}.${ROCM_LIBPATCH_VERSION}" )
-set( SO_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${PATCH_STRING}" )
+set( SO_VERSION_STRING "${SO_MAJOR}.${SO_MINOR}.${ROCM_LIBPATCH_VERSION}" )
 set_property( TARGET ${CORE_TARGET} PROPERTY VERSION "${SO_VERSION_STRING}" )
-set_property( TARGET ${CORE_TARGET} PROPERTY SOVERSION "${VERSION_MAJOR}" )
+set_property( TARGET ${CORE_TARGET} PROPERTY SOVERSION "${SO_MAJOR}" )
 
 
 #intallation directive
