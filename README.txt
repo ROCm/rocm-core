@@ -14,6 +14,9 @@ For building :
              -DCMAKE_VERBOSE_MAKEFILE=1 \
              -DCMAKE_INSTALL_PREFIX=./ \
              -DCPACK_GENERATOR=DEB \
+             -DCPACK_DEBIAN_PACKAGE_RELEASE="local.9999~20.04" \
+             -DCPACK_RPM_PACKAGE_RELEASE="local.9999" \
+             -DROCM_VERSION="5.5.0" \
              ..
 
          make

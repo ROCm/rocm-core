@@ -128,6 +128,26 @@ function( set_variables )
         endif()
     endif()
 
+    #set libpatch version
+    if(NOT DEFINED ROCM_LIBPATCH_VERSION)
+      set(ROCM_LIBPATCH_VERSION "${VERSION_MAJOR}")
+      string(LENGTH ${VERSION_MINOR} LENSTR)
+      if(LENSTR EQUAL 1) # length of version cannot be zero hence it would be 1 or greater
+         set(ROCM_LIBPATCH_VERSION "${ROCM_LIBPATCH_VERSION}0${VERSION_MINOR}")
+      else() # length is greater than 1
+         set(ROCM_LIBPATCH_VERSION "${ROCM_LIBPATCH_VERSION}${VERSION_MINOR}")
+      endif()
+
+      string(LENGTH ${VERSION_PATCH} LENSTR)
+      if(LENSTR EQUAL 1) # length of version cannot be zero hence it would be 1 or greater
+         set(ROCM_LIBPATCH_VERSION "${ROCM_LIBPATCH_VERSION}0${VERSION_PATCH}")
+      else() # length is greater than 1
+         set(ROCM_LIBPATCH_VERSION "${ROCM_LIBPATCH_VERSION}${VERSION_PATCH}")
+      endif()
+
+      set(ROCM_LIBPATCH_VERSION "${ROCM_LIBPATCH_VERSION}" PARENT_SCOPE )
+    endif()
+
     if ( DEFINED CPACK_RPM_PACKAGE_RELEASE )
       set ( CPACK_RPM_PACKAGE_RELEASE ${CPACK_RPM_PACKAGE_RELEASE} PARENT_SCOPE )
     else()
@@ -146,6 +166,7 @@ function( set_variables )
     message(STATUS "VERSION_MAJOR : ${VERSION_MAJOR}" )
     message(STATUS "VERSION_MINOR : ${VERSION_MINOR}" )
     message(STATUS "VERSION_PATCH : ${VERSION_PATCH}" )
+    message(STATUS "ROCM_LIBPATCH_VERSION : ${ROCM_LIBPATCH_VERSION}" )
     message(STATUS "VERSION_COMMIT_COUNT : ${VERSION_COMMIT_COUNT}" )
     message(STATUS "VERSION_HASH : ${VERSION_HASH}" )
     message(STATUS "CPACK_DEBIAN_PACKAGE_RELEASE : ${CPACK_DEBIAN_PACKAGE_RELEASE}" )
