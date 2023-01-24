@@ -1,5 +1,14 @@
+Introduction: 
+rocm-core is a utility which can be used to get ROCm release version. 
+It also provides the Lmod modules files for the ROCm release.
+getROCmVersion function provides the ROCm version. 
 
-For building :
+Lmod module files can be loaded with the following commads.
+module load rocm/x.y or 
+module load rocm
+
+
+Build:
 
   git clone <URL to git repo >
 
