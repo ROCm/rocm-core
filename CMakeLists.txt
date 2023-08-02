@@ -144,15 +144,13 @@ set ( CPACK_RPM_FILE_NAME "RPM-DEFAULT" )
 
 # Debian package specific variables
 set ( CPACK_DEBIAN_PACKAGE_DEPENDS ${DEB_DEPENDS_STRING} )
-# TODO: Need to enable this later :Commenting for testing purpose
-#set ( CPACK_DEBIAN_ASAN_PACKAGE_DEPENDS ${CORE_TARGET} )
+set ( CPACK_DEBIAN_ASAN_PACKAGE_DEPENDS ${CORE_TARGET} )
 set ( CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/RadeonOpenCompute/ROCm" )
 set ( CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA "${BUILD_DIR}/postinst;${BUILD_DIR}/prerm" )
 
 ## RPM package specific variables
 set ( CPACK_RPM_PACKAGE_REQUIRES ${RPM_DEPENDS_STRING} )
-# TODO: Need to enable this later :Commenting for testing purpose
-#set ( CPACK_RPM_ASAN_PACKAGE_REQUIRES ${CORE_TARGET} )
+set ( CPACK_RPM_ASAN_PACKAGE_REQUIRES ${CORE_TARGET} )
 set ( CPACK_RPM_PACKAGE_LICENSE "MIT" )
 set ( CPACK_RPM_RUNTIME_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/postinst" )
 set ( CPACK_RPM_RUNTIME_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/prerm" )
