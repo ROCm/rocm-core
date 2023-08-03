@@ -45,6 +45,10 @@ set( CPACK_GENERATOR "TGZ;DEB;RPM" CACHE STRING "package types to be produced " 
 set( COPYRIGHT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/copyright"  )
 set( BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR} )
 
+if(NOT ENABLE_ASAN_PACKAGING)
+    option(FILE_REORG_BACKWARD_COMPATIBILITY "Enable File Reorg with backward compatibility" ON)
+endif()
+
 ## Set variables
 set_variables()
 
@@ -63,6 +67,29 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm-core.prerm ${BUILD_DIR}/prerm @
 
 #Generate BUILD_INFO
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm_version.h.in ${BUILD_DIR}/rocm_version.h @ONLY )
+
+#File reorg Backward compatibility function
+if(NOT WIN32)
+    if(FILE_REORG_BACKWARD_COMPATIBILITY)
+    # To enabe/disable #error in wrapper header files
+        if(NOT DEFINED ROCM_HEADER_WRAPPER_WERROR)
+            if(DEFINED ENV{ROCM_HEADER_WRAPPER_WERROR})
+                set(ROCM_HEADER_WRAPPER_WERROR "$ENV{ROCM_HEADER_WRAPPER_WERROR}"
+                    CACHE STRING "Header wrapper warnings as errors.")
+            else()
+                set(ROCM_HEADER_WRAPPER_WERROR "OFF" CACHE STRING "Header wrapper warnings as errors.")
+            endif()
+        endif()
+
+        if(ROCM_HEADER_WRAPPER_WERROR)
+            set(deprecated_error 1)
+        else()
+            set(deprecated_error 0)
+        endif()
+
+        include(rocm-core-backward-compat.cmake)
+    endif() #FILE_REORG_BACKWARD_COMPATIBILITY
+endif()
 
 #Make the rocmlib
 set( SRCS rocm_version.cpp )
