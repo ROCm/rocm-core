@@ -35,29 +35,17 @@ try:
     from elftools.elf.elffile import ELFFile
     from elftools.elf.dynamic import DynamicSection
     from elftools.common.exceptions import ELFError
+    from elftools.elf.dynamic import ENUM_D_TAG
 except ImportError:
     print("Error : pyelftools failed to import.\n"
           "Run \'pip3 install pyelftools\' to install the prerequisite\n")
-
-# Function remove the runpath from the binary
-def remove_runpath(filename) :
-    ''' Remove the DT_RUNPATH tag from filename'''
-    REMOVE_RPATH_COMMAND = ['patchelf', '--remove-rpath',  filename]
-    print("Executing the command : ", REMOVE_RPATH_COMMAND)
-    subprocess.run(REMOVE_RPATH_COMMAND, check=True)
-
-def add_rpath(filename, runpath) :
-    ''' Use runpath and add it as DT_PATH tag in filename'''
-    ADD_RPATH_COMMAND = ['patchelf', '--force-rpath',  '--set-rpath', runpath, filename]
-    print("Executing the command : ", ADD_RPATH_COMMAND)
-    subprocess.run(ADD_RPATH_COMMAND, check=True)
 
 def update_rpath(search_path, excludes) :
     ''' Function helps to change DT_RUNPATH in libraries and binaries in search_path to DT_RPATH.
         Its done with the following steps :
         1. Check all if the file is an ELF except in excludes folder
-        2. Read and store the DT_RUNPATH from the binaries/libraries.
-        3. Delete DT_RUNPATH and readd it as DT_RPATH '''
+        2. Find the DT_RUNPATH tag and its offset from file.
+        3. Toggle the DT_RUNPATH(0x1d) tag byte to DT_RPATH(0xf) and write back to file '''
     for path, dirs, files in os.walk(search_path, topdown=True, followlinks=True):
         dirs[:] = [d for d in dirs if d not in excludes]
         print( dirs )
@@ -66,19 +54,22 @@ def update_rpath(search_path, excludes) :
             print("Opening file ",  filename)
             # Open the file and check if its ELF file
             try :
-                with open(filename, 'rb') as file:
+                with open(filename, 'rb+') as file:
                     elffile = ELFFile(file)
-                    for section in elffile.iter_sections():
-                        if not isinstance(section, DynamicSection):
-                            continue
-                        for tag in section.iter_tags():
-                            if tag.entry.d_tag == 'DT_RUNPATH':
-                                runpath = tag.runpath
-                                print(runpath)
-                                remove_runpath(filename)
-                                add_rpath(filename, runpath)
-                                break
-                        break
+                    # Find the dynamic section and look for DT_RUNPATH tag
+                    section = elffile.get_section_by_name('.dynamic')
+                    if not section: break
+                    n = 0
+                    for tag in section.iter_tags():
+                        # DT_RUNPATH tag found. Toggle the byte to DT_RPATH
+                        if tag.entry.d_tag == 'DT_RUNPATH':
+                            offset = section.header.sh_offset + n* section._tagsize
+                            section.stream.seek(offset)
+                            section.stream.write(bytes([ENUM_D_TAG['DT_RPATH']])) # DT_PATH
+                            print("DT_RUNPATH changed to DT_RPATH ")
+                            break
+                        # DT_RUNPATH tag not found. Loop to the next tag
+                        n = n + 1
             except ELFError:
                 print("Discarding file as its not an ELF file", filename)
                 continue
