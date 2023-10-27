@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Collects system information for diagnosing ROCm issues, and outputs them to stdout.
 # Should be run as superuser.
 #
