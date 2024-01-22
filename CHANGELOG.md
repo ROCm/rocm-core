@@ -1,7 +1,9 @@
 Change Logs for rocm-core
 
-
-Unreleased ROCm6.0.0 release
+Unreleased ROCm6.1.0 release
+ - Added new API to get ROCm install Path (getROCmInstallPath()) at runtime
+   using dlinfo of rocm-core Target Library.
+ROCm6.0.0 release
  - Added script to convert RUNPATH in libraries and binaries to RPATH.
  - Disabled ROCm file reorg backward compatibility
 

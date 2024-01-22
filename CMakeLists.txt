@@ -29,6 +29,9 @@ set( CORE_TARGET "rocm-core" )
 
 project( ${CORE_TARGET} CXX )
 
+## Define Lib Target Name and Lib Target Install Dir to be available to c++ source
+add_definitions( -DTARGET_LIBRARY_NAME=\"${CORE_TARGET}\" -DTARGET_LIBRARY_INSTALL_DIR=\"${CMAKE_INSTALL_LIBDIR}\" )
+
 ## Verbose output.
 set( CMAKE_VERBOSE_MAKEFILE on )
 
@@ -67,7 +70,7 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm-core.prerm ${BUILD_DIR}/prerm @
 
 #Generate BUILD_INFO
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm_version.h.in ${BUILD_DIR}/rocm_version.h @ONLY )
-
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm_getpath.h.in ${BUILD_DIR}/rocm_getpath.h @ONLY )
 #File reorg Backward compatibility function
 if(NOT WIN32)
     if(FILE_REORG_BACKWARD_COMPATIBILITY)
@@ -92,12 +95,13 @@ if(NOT WIN32)
 endif()
 
 #Make the rocmlib
-set( SRCS rocm_version.cpp )
+set( SRCS rocm_version.cpp rocm_getpath.cpp)
 add_library( ${CORE_TARGET} ${SRCS} )
 
 set( CXX_FLAGS ${CXX_FLAGS} -g -fPIC -fvisibility=hidden -W -Wall -Wextra -Wno-unused-parameter -Wformat-security -Wundef -Wshadow -Wpointer-arith -Wcast-qual -Wmissing-declarations -Wredundant-decls -Wunreachable-code -std=c++11 )
 set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}  -Wl,-z,nodelete -Wl,-no-undefined" )
 target_include_directories( ${CORE_TARGET} PRIVATE ${BUILD_DIR} )
+target_link_libraries( ${CORE_TARGET} PRIVATE dl )
 
 ## Set the VERSION and SOVERSION values
 set( SO_VERSION_STRING "${SO_MAJOR}.${SO_MINOR}.${ROCM_LIBPATCH_VERSION}" )
@@ -121,7 +125,10 @@ install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/version DESTINATION .info COMPONENT 
 install ( TARGETS ${CORE_TARGET} DESTINATION ${CMAKE_INSTALL_LIBDIR}
           PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
           COMPONENT ${COMP_TYPE} )
-install ( FILES ${BUILD_DIR}/rocm_version.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core COMPONENT runtime )
+install ( FILES ${BUILD_DIR}/rocm_version.h ${BUILD_DIR}/rocm_getpath.h
+          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core
+          COMPONENT runtime )
+
 install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/runpath_to_rpath.py DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/rocm-core COMPONENT runtime )
 install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/rocmmod DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime )
 
