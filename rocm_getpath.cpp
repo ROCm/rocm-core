@@ -99,6 +99,8 @@ static int getROCmBase(char *buf)
   char libFileName[LIBRARY_FILENAME_BUFSZ];
   char *end=NULL;
 
+  // Check Environment Variable is set for ROCM
+  // install base path, then use it directly.
   if ((envStr = getenv("ROCM_PATH"))) {
     /* User space override, essentially just copied through as long as it is not too long */
     len = strlen(envStr);
@@ -119,6 +121,9 @@ static int getROCmBase(char *buf)
     }
   }
 
+  // If Environment Variable is not set
+  // use dl APIs to get target lib path
+  // and get rocm base install path using the lib Path.
   sprintf(libFileName, "lib%s.so", TARGET_LIBRARY_NAME);
   void *handle=dlopen(libFileName,RTLD_NOW);
   if (!handle){
