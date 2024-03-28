@@ -124,6 +124,7 @@ static int getROCmBase(char *buf)
   // If Environment Variable is not set
   // use dl APIs to get target lib path
   // and get rocm base install path using the lib Path.
+#if BUILD_SHARED_LIBS
   sprintf(libFileName, "lib%s.so", TARGET_LIBRARY_NAME);
   void *handle=dlopen(libFileName,RTLD_NOW);
   if (!handle){
@@ -157,6 +158,7 @@ static int getROCmBase(char *buf)
     return PathLinuxRuntimeErrors;
   }
   *end = '\0';
+#endif
 
   /* Length of Path String up to Parent Directoy (ROCm Base Path)
    * with trailing '/'.*/
