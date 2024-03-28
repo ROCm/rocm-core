@@ -101,7 +101,9 @@ add_library( ${CORE_TARGET} ${SRCS} )
 set( CXX_FLAGS ${CXX_FLAGS} -g -fPIC -fvisibility=hidden -W -Wall -Wextra -Wno-unused-parameter -Wformat-security -Wundef -Wshadow -Wpointer-arith -Wcast-qual -Wmissing-declarations -Wredundant-decls -Wunreachable-code -std=c++11 )
 set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}  -Wl,-z,nodelete -Wl,-no-undefined" )
 target_include_directories( ${CORE_TARGET} PRIVATE ${BUILD_DIR} )
-target_link_libraries( ${CORE_TARGET} PRIVATE dl )
+if(BUILD_SHARED_LIBS)
+  target_link_libraries( ${CORE_TARGET} PRIVATE dl )
+endif()
 
 ## Set the VERSION and SOVERSION values
 set( SO_VERSION_STRING "${SO_MAJOR}.${SO_MINOR}.${ROCM_LIBPATCH_VERSION}" )
@@ -110,30 +112,75 @@ set_property( TARGET ${CORE_TARGET} PROPERTY SOVERSION "${SO_MAJOR}" )
 
 if(ENABLE_ASAN_PACKAGING)
   # Only libraries required for ASAN Package
-  set( CPACK_COMPONENTS_ALL asan )
-  set( COMP_TYPE "asan" )
+  set( CPACK_COMPONENTS_ALL CORE_ASAN )
+  set( COMP_TYPE "CORE_ASAN" )
   set( PKG_DESCRIPTION "Radeon Open Compute (ROCm) AddressSanitizer Instrumented Runtime software stack" )
 else()
-  set( CPACK_COMPONENTS_ALL runtime )
-  set( COMP_TYPE "runtime" )
-  set( PKG_DESCRIPTION "Radeon Open Compute (ROCm) Runtime software stack" )
+  if(BUILD_SHARED_LIBS)
+    set( CPACK_COMPONENTS_ALL CORE_RUNTIME )
+    set( COMP_TYPE "CORE_RUNTIME" )
+    set( PKG_DESCRIPTION "Radeon Open Compute (ROCm) Runtime software stack" )
+  else()
+    set( CPACK_COMPONENTS_ALL CORE_STATIC )
+    set( STATIC_COMP_TYPE "CORE_STATIC" )
+    set( PKG_DESCRIPTION "Radeon Open Compute (ROCm) Static software stack" )
+  endif()
 endif()
 
 #intallation directive
 file ( WRITE "${CMAKE_CURRENT_BINARY_DIR}/version" "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${BUILD_ID}\n" )
-install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/version DESTINATION .info COMPONENT runtime )
-install ( TARGETS ${CORE_TARGET} DESTINATION ${CMAKE_INSTALL_LIBDIR}
-          COMPONENT ${COMP_TYPE} )
-install ( FILES ${BUILD_DIR}/rocm_version.h ${BUILD_DIR}/rocm_getpath.h
-          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core
-          COMPONENT runtime )
 
-install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/runpath_to_rpath.py DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/rocm-core COMPONENT runtime )
-install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/rocmmod DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime )
+## Support for Static and Shared Target Packaging
+if(BUILD_SHARED_LIBS)
+  install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/version DESTINATION .info COMPONENT CORE_RUNTIME )
 
-# License file
-install(FILES ${COPYRIGHT_FILE} DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt COMPONENT runtime)
-install(FILES ${COPYRIGHT_FILE} DESTINATION ${CMAKE_INSTALL_DOCDIR}-asan RENAME LICENSE.txt COMPONENT asan)
+  # Target Library needs to installed/packaged to same destination
+  # in both ASAN and nonASAN Shared library builds
+  install ( TARGETS ${CORE_TARGET} DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+            COMPONENT ${COMP_TYPE} )
+  install ( FILES ${BUILD_DIR}/rocm_version.h ${BUILD_DIR}/rocm_getpath.h
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core
+            COMPONENT CORE_RUNTIME )
+
+  install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/runpath_to_rpath.py
+            DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/rocm-core
+            COMPONENT CORE_RUNTIME )
+  install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/rocmmod
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT CORE_RUNTIME )
+
+  # License file
+  install ( FILES ${COPYRIGHT_FILE}
+            DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt
+            COMPONENT CORE_RUNTIME)
+  install ( FILES ${COPYRIGHT_FILE} DESTINATION
+            ${CMAKE_INSTALL_DOCDIR}-asan RENAME LICENSE.txt
+            COMPONENT CORE_ASAN)
+else()
+  install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/version
+            DESTINATION .info
+            COMPONENT ${STATIC_COMP_TYPE} )
+  install ( TARGETS ${CORE_TARGET}
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT ${STATIC_COMP_TYPE} )
+
+  install ( FILES ${BUILD_DIR}/rocm_version.h ${BUILD_DIR}/rocm_getpath.h
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core
+            COMPONENT ${STATIC_COMP_TYPE} )
+
+  install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/runpath_to_rpath.py
+            DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/rocm-core
+            COMPONENT ${STATIC_COMP_TYPE} )
+  install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/rocmmod
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT ${STATIC_COMP_TYPE} )
+  # License file
+  install ( FILES ${COPYRIGHT_FILE}
+            DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt
+            COMPONENT ${STATIC_COMP_TYPE})
+endif()
+
 
 ## Packaging directives
 set ( CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc." )
@@ -152,17 +199,22 @@ endif()
 
 ## Debian package specific variables
 set ( CPACK_DEB_COMPONENT_INSTALL ON )
-set ( CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CORE_TARGET}" )
+set ( CPACK_DEBIAN_CORE_RUNTIME_PACKAGE_NAME "${CORE_TARGET}" )
 # ASAN package name
-set ( CPACK_DEBIAN_ASAN_PACKAGE_NAME ${CORE_TARGET}-asan )
+set ( CPACK_DEBIAN_CORE_ASAN_PACKAGE_NAME ${CORE_TARGET}-asan )
+# STATIC package name - For Now, No change for static package Name from default
+set ( CPACK_DEBIAN_CORE_STATIC_PACKAGE_NAME ${CORE_TARGET} )
 message ( STATUS "Using CPACK_DEBIAN_PACKAGE_RELEASE ${CPACK_DEBIAN_PACKAGE_RELEASE}" )
 set ( CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT" )
 
 ## RPM package specific variables
 set ( CPACK_RPM_COMPONENT_INSTALL ON )
-set ( CPACK_RPM_RUNTIME_PACKAGE_NAME "${CORE_TARGET}" )
+set ( CPACK_RPM_CORE_RUNTIME_PACKAGE_NAME "${CORE_TARGET}" )
 # ASAN package name
-set ( CPACK_RPM_ASAN_PACKAGE_NAME ${CORE_TARGET}-asan )
+set ( CPACK_RPM_CORE_ASAN_PACKAGE_NAME ${CORE_TARGET}-asan )
+# STATIC package name - For Now, No change for static package Name from default
+set ( CPACK_RPM_CORE_STATIC_PACKAGE_NAME ${CORE_TARGET} )
+
 
 ## 'dist' breaks manual builds on debian systems due to empty Provides
 execute_process( COMMAND rpm --eval %{?dist}
@@ -178,16 +230,19 @@ set ( CPACK_RPM_FILE_NAME "RPM-DEFAULT" )
 
 # Debian package specific variables
 set ( CPACK_DEBIAN_PACKAGE_DEPENDS ${DEB_DEPENDS_STRING} )
-set ( CPACK_DEBIAN_ASAN_PACKAGE_DEPENDS ${CORE_TARGET} )
 set ( CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/RadeonOpenCompute/ROCm" )
-set ( CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA "${BUILD_DIR}/postinst;${BUILD_DIR}/prerm" )
+set ( CPACK_DEBIAN_CORE_ASAN_PACKAGE_DEPENDS ${CORE_TARGET} )
+set ( CPACK_DEBIAN_CORE_RUNTIME_PACKAGE_CONTROL_EXTRA "${BUILD_DIR}/postinst;${BUILD_DIR}/prerm" )
+set ( CPACK_DEBIAN_CORE_STATIC_PACKAGE_CONTROL_EXTRA "${BUILD_DIR}/postinst;${BUILD_DIR}/prerm" )
 
 ## RPM package specific variables
 set ( CPACK_RPM_PACKAGE_REQUIRES ${RPM_DEPENDS_STRING} )
-set ( CPACK_RPM_ASAN_PACKAGE_REQUIRES ${CORE_TARGET} )
 set ( CPACK_RPM_PACKAGE_LICENSE "MIT" )
-set ( CPACK_RPM_RUNTIME_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/postinst" )
-set ( CPACK_RPM_RUNTIME_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/prerm" )
+set ( CPACK_RPM_CORE_ASAN_PACKAGE_REQUIRES ${CORE_TARGET} )
+set ( CPACK_RPM_CORE_RUNTIME_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/postinst" )
+set ( CPACK_RPM_CORE_RUNTIME_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/prerm" )
+set ( CPACK_RPM_CORE_STATIC_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/postinst" )
+set ( CPACK_RPM_CORE_STATIC_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/prerm" )
 
 if ( DEFINED CPACK_PACKAGING_INSTALL_PREFIX )
     set ( CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "${CPACK_PACKAGING_INSTALL_PREFIX} ${CPACK_PACKAGING_INSTALL_PREFIX}/.info" )

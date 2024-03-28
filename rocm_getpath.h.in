@@ -34,6 +34,9 @@ extern "C" {
 
 #define LIB_API_PUBLIC __attribute__ ((visibility ("default")))
 
+/* Get Library Target Build Type */
+#cmakedefine01 BUILD_SHARED_LIBS
+
 /* Return Status Flag Definitions*/
 typedef enum {
         PathSuccess=0,
