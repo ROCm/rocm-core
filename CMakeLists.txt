@@ -192,6 +192,12 @@ set ( CPACK_RPM_RUNTIME_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/
 if ( DEFINED CPACK_PACKAGING_INSTALL_PREFIX )
     set ( CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "${CPACK_PACKAGING_INSTALL_PREFIX} ${CPACK_PACKAGING_INSTALL_PREFIX}/.info" )
 endif ( )
+# Backward compatibility support for deprecated package rocm-clang-ocl
+# TODO: To be removed after two releases
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_REPLACES "rocm-clang-ocl")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONFLICTS "rocm-clang-ocl")
+
+set(CPACK_RPM_RUNTIME_PACKAGE_OBSOLETES "rocm-clang-ocl")
 
 ## Include packaging
 include ( CPack )
