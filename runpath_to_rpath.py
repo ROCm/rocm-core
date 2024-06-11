@@ -169,7 +169,8 @@ def main():
         sys.exit(0)
 
     # Find the elf files in the serach path and update DT_RUNPATH to DT_RPATH
-    excludes = ['llvm', 'rocm-llvm', 'rocm-llvm-alt']
+    # SWDEV-467155 : remove the exclusion of llvm folder
+    excludes = []
     update_rpath(args.searchdir, excludes)
     # Update rocm clang configs to default to DT_RPATH
     update_compiler_config(args.searchdir)
