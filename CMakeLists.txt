@@ -137,7 +137,6 @@ if(BUILD_SHARED_LIBS)
   # Target Library needs to installed/packaged to same destination
   # in both ASAN and nonASAN Shared library builds
   install ( TARGETS ${CORE_TARGET} DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
             COMPONENT ${COMP_TYPE} )
   install ( FILES ${BUILD_DIR}/rocm_version.h ${BUILD_DIR}/rocm_getpath.h
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core
