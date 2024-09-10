@@ -65,7 +65,13 @@ if( NOT DEFINED BUILD_ID )
   set( BUILD_ID "9999")
 endif()
 
-set( PACKAGE_BUILD_INFO "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_COMMIT_COUNT}-${BUILD_ID}-${VERSION_HASH}" )
+#Add the libpatch version if available
+if( DEFINED VERSION_POINT )
+  set( PACKAGE_BUILD_INFO "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_POINT}.${VERSION_COMMIT_COUNT}-${BUILD_ID}-${VERSION_HASH}" )
+  message ( STATUS "PACKAGE_BUILD_INFO ${PACKAGE_BUILD_INFO}" )
+else ()
+  set( PACKAGE_BUILD_INFO "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_COMMIT_COUNT}-${BUILD_ID}-${VERSION_HASH}" )
+endif()
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocmmod.in ${BUILD_DIR}/rocmmod @ONLY )
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm-core.postinst ${BUILD_DIR}/postinst @ONLY )
@@ -130,8 +136,12 @@ else()
   endif()
 endif()
 
-#intallation directive
-file ( WRITE "${CMAKE_CURRENT_BINARY_DIR}/version" "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${BUILD_ID}\n" )
+#Add the libpatch version if available to the version file
+if( DEFINED VERSION_POINT )
+  file ( WRITE "${CMAKE_CURRENT_BINARY_DIR}/version" "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_POINT}-${BUILD_ID}\n" )
+else()
+  file ( WRITE "${CMAKE_CURRENT_BINARY_DIR}/version" "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${BUILD_ID}\n" )
+endif()
 
 ## Support for Static and Shared Target Packaging
 if(BUILD_SHARED_LIBS)
