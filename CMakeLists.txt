@@ -32,6 +32,9 @@ project( ${CORE_TARGET} CXX )
 ## Define Lib Target Name and Lib Target Install Dir to be available to c++ source
 add_definitions( -DTARGET_LIBRARY_NAME=\"${CORE_TARGET}\" -DTARGET_LIBRARY_INSTALL_DIR=\"${CMAKE_INSTALL_LIBDIR}\" )
 
+## Build Type Settings
+set( CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." )
+
 ## Verbose output.
 set( CMAKE_VERBOSE_MAKEFILE on )
 
@@ -136,7 +139,7 @@ if(BUILD_SHARED_LIBS)
 
   # Target Library needs to installed/packaged to same destination
   # in both ASAN and nonASAN Shared library builds
-  install ( TARGETS ${CORE_TARGET} DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  install ( TARGETS ${CORE_TARGET} EXPORT rocmCoreTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT ${COMP_TYPE} )
   install ( FILES ${BUILD_DIR}/rocm_version.h ${BUILD_DIR}/rocm_getpath.h
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core
@@ -161,6 +164,7 @@ else()
             DESTINATION .info
             COMPONENT ${STATIC_COMP_TYPE} )
   install ( TARGETS ${CORE_TARGET}
+            EXPORT rocmCoreTargets
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT ${STATIC_COMP_TYPE} )
 
@@ -180,6 +184,45 @@ else()
             COMPONENT ${STATIC_COMP_TYPE})
 endif()
 
+## Cmake module config file configurations
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/" CACHE INTERNAL "Default module path.")
+
+## Export the package for use from the build-tree
+## (this registers the build-tree with a global CMake-registry)
+export(PACKAGE ${CORE_TARGET})
+set(CONF_LIB_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+
+## Create the rocm-core-config.cmake and rocm-core-config-version files
+include(CMakePackageConfigHelpers)
+set(CONFIG_PACKAGE_INSTALL_DIR ${CONF_LIB_DIR}/cmake/${CORE_TARGET})
+set(LIB_INSTALL_DIR  "${CMAKE_INSTALL_LIBDIR}")
+set(INCLUDE_INSTALL_DIR  "${CMAKE_INSTALL_INCLUDEDIR}")
+set(BIN_INSTALL_DIR  "${CMAKE_INSTALL_BINDIR}")
+
+## Generate Config File for rocm-core
+configure_package_config_file(
+    ${CMAKE_MODULE_PATH}/${CORE_TARGET}-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${CORE_TARGET}-config.cmake
+    INSTALL_DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
+    PATH_VARS LIB_INSTALL_DIR INCLUDE_INSTALL_DIR BIN_INSTALL_DIR
+)
+
+## Generate config Version File for rocm-core
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/${CORE_TARGET}-config-version.cmake
+    VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+    COMPATIBILITY SameMajorVersion)
+
+## Install the rocm-core-config.cmake and rocm-core-config-version.cmake
+install(FILES
+    "${PROJECT_BINARY_DIR}/${CORE_TARGET}-config.cmake"
+    "${PROJECT_BINARY_DIR}/${CORE_TARGET}-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${CORE_TARGET}"
+    COMPONENT ${COMP_TYPE})
+
+## Install the export set for use with the install-tree
+install(EXPORT rocmCoreTargets DESTINATION
+    "${CMAKE_INSTALL_LIBDIR}/cmake/${CORE_TARGET}" COMPONENT ${COMP_TYPE})
 
 ## Packaging directives
 set ( CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc." )
