@@ -34,13 +34,22 @@ do_update_alternatives(){
     altscore=$((altscore*1000000+(now-1600000000)/60))
 
     # Update the /opt/rocm symlink
-    update-alternatives --install "/opt/rocm" "rocm" "@CPACK_PACKAGING_INSTALL_PREFIX@" "$altscore"
+    # For custom location installation of rpm package, /opt/rocm symlink is not required
+    # TBD: For custom location installation of deb package.
+    if [[ "$DISTRIB_ID" == "Ubuntu" ]] || [[ "$RPM_INSTALL_PREFIX0" == "/opt/rocm-"* ]] ; then
+        update-alternatives --install "/opt/rocm" "rocm" "@CPACK_PACKAGING_INSTALL_PREFIX@" "$altscore"
+    fi
+
     for loc in "/usr/share/modules/modulefiles" "/usr/local/Modules/modulefiles" "/usr/share/Modules/modulefiles"
     do
        if [ -d "$loc" ]
        then
            mkdir -p "$loc/rocm"
-           update-alternatives --install "$loc/rocm/@ROCM_VERSION@" "rocmmod@ROCM_VERSION@" "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/rocmmod" "$altscore"
+           if [[ "$DISTRIB_ID" == "Ubuntu" ]] ; then
+               update-alternatives --install "$loc/rocm/@ROCM_VERSION@" "rocmmod@ROCM_VERSION@" "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/rocmmod" "$altscore"
+           else
+               update-alternatives --install "$loc/rocm/@ROCM_VERSION@" "rocmmod@ROCM_VERSION@" "$RPM_INSTALL_PREFIX0/@CMAKE_INSTALL_LIBDIR@/rocmmod" "$altscore"
+           fi
            break;
        fi
     done
