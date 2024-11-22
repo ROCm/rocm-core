@@ -15,8 +15,6 @@ that are required to shepherd a change-set into the repository.
 
 [Responsibility of the Reviewer](#Responsibility-of-the-Reviewer)
 
-[Passing CI](#Passing-CI)
-
 [The Review](#the-review)
 
 [References](#References)
@@ -25,6 +23,7 @@ rocm-core is a utility which can be used to get ROCm release version.
 It also provides the Lmod modules files for the ROCm release.
 getROCmVersion function provides the ROCm version. 
 
+## How do I contribute
 ### Deliverables
 All contributions you make will be under the [MIT Software License](copyright).
 For each new file in repository, 
@@ -57,8 +56,21 @@ Please include the licensing header
  *******************************************************************************/
 ```
 
+### Formatting the code
+
+All the code is formatted using `clang-format`. To format a file, use:
+
+```shell
+clang-format-10 -style=file -i <path-to-source-file>
+```
+
+To format the code per commit, you can install githooks:
+
+```shell
+./.githooks/install
+```
+
  
-## How do I contribute
 ### Reporting Issues
 We use [GitHub Issues](https://github.com/ROCm/rocm-core/issues) to track public **bugs** and **enhancement requests**.
 
@@ -82,7 +94,7 @@ Please follow the template below to report any enhancement requests for ROCM-COR
 * Any alternatives:
 3. Any additional information:
 
-The author must set labels (and assigns a miliestone) according to his/her own understanding.
+The author must set labels (and assigns a milestone) according to his/her own understanding.
 
 Other contributors can change these values if they disagree. That being said, 
 adding a small comment explaining the motivation is highly recommended. 
@@ -124,23 +136,15 @@ maintain or improve the overall quality of the codebase.
 Reviewer's task checklist:
 1. Has the PR passed?
 2. Does the PR consist of a well-organized sequence of small commits, 
-each of which is designed to make one specific feature or fix 
-(and ideally should be able to pass CI testing)?
+each of which is designed to make one specific feature or fix ?
 3. Does the PR only include a reviewable amount of changes? Or it is a 
 consolidation of already reviewed small batches? e.g. break it into smaller 
 testable and reviewable tasks instead of a huge chunk at once.
 4. Does the PR have sufficient documentation and easy to read and understand, 
 feasible for test and future maintainence, related docs already in place? 
 if API or functionality has changed?
-5. For bugfixes and new features, new regression test created and included in CI,
- or some other holistic test pipeline?
+5. For bugfixes and new features, new regression test created?
 6. Is every PR associated with a ticket or issue number for tracking purposes?
-
-## Passing CI
-The most critical component of the PR process is the CI testing. 
-All PRs must pass the CI in order to be considered for merger. 
-Reviewers may choose to defer their review until the CI testing 
-has passed. 
 
 ## The Review
 During the review, reviewers will look over the changes and make 
