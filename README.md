@@ -42,31 +42,22 @@ First, get the sources from repository.
 Go to Root Directory, create a build directory:
 
 ```shell
-  cd rocm-core; mkdir -p build ;  cd build
+  cd rocm-core; mkdir build ;  cd build
 ```
 
 Next, configure CMake. Invoke cmake with the following variables define as deemed fit
 
 ```shell
-cmake '-DCMAKE_PREFIX_PATH=/opt/rocm-6.4.0' \ 
--DCMAKE_BUILD_TYPE=Release \
--DCMAKE_VERBOSE_MAKEFILE=1 \
--DCPACK_GENERATOR=DEB \
--DROCM_PATCH_VERSION=60400 \
--DCMAKE_INSTALL_PREFIX=/opt/rocm-6.4.0 \
--DCPACK_PACKAGING_INSTALL_PREFIX=/opt/rocm-6.4.0 \
--DROCM_DEP_ROCMCORE=ON \
--DFILE_REORG_BACKWARD_COMPATIBILITY=OFF \
--DCPACK_RPM_PACKAGE_RELOCATABLE=ON \
--DCPACK_SET_DESTDIR=OFF \
--DINCLUDE_PATH_COMPATIBILITY=OFF \
--DCMAKE_INSTALL_LIBDIR=lib \
--DBUILD_SHARED_LIBS=ON \
--DCPACK_DEBIAN_PACKAGE_RELEASE=crdnnh.15156~22.04 \
--DCPACK_RPM_PACKAGE_RELEASE=crdnnh.15156 \
--DROCM_VERSION=6.4.0 \
--DBUILD_ID=15156 \
+cmake -DCMAKE_CURRENT_BINARY_DIR=$PWD \
+      -DCMAKE_CURRENT_SOURCE_DIR=$PWD/../ \
+      -DCMAKE_VERBOSE_MAKEFILE=1 \
+      -DCMAKE_INSTALL_PREFIX=./ \
+      -DCPACK_GENERATOR=DEB \
+      -DCPACK_DEBIAN_PACKAGE_RELEASE="local.9999~20.04" \
+      -DCPACK_RPM_PACKAGE_RELEASE="local.9999" \
+      -DROCM_VERSION="6.4.0"
 ```
+
 >[!NOTE]
 >When specifying the path for the `CMAKE_PREFIX_PATH` variable, **do not** use the tilde (`~`)
 >shorthand to represent the home directory.
