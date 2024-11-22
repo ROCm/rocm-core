@@ -159,5 +159,5 @@ authors can take the following actions:
 
 ## References
 
-1. [ROCM-CORE Readme](https://github.com/ROCm/rocm-core#readme)
+1. [ROCM-CORE Readme](README.md)
 
