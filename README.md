@@ -42,7 +42,7 @@ First, get the sources from repository.
 Go to Root Directory, create a build directory:
 
 ```shell
-  cd rocm-core; mkdir build ;  cd build
+  cd rocm-core; mkdir build; cd build
 ```
 
 Next, configure CMake. Invoke cmake with the following variables define as deemed fit
@@ -52,10 +52,8 @@ cmake -DCMAKE_CURRENT_BINARY_DIR=$PWD \
       -DCMAKE_CURRENT_SOURCE_DIR=$PWD/../ \
       -DCMAKE_VERBOSE_MAKEFILE=1 \
       -DCMAKE_INSTALL_PREFIX=./ \
-      -DCPACK_GENERATOR=DEB \
-      -DCPACK_DEBIAN_PACKAGE_RELEASE="local.9999~20.04" \
-      -DCPACK_RPM_PACKAGE_RELEASE="local.9999" \
-      -DROCM_VERSION="6.4.0"
+      -DROCM_VERSION="6.4.0" \
+      ..
 ```
 
 >[!NOTE]
