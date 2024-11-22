@@ -135,40 +135,22 @@ cmake -DCMAKE_INSTALL_PREFIX=<rocm-core-install-path> ..
 
 ## ROCM-CORE Library
 
-The flags for the lib would the following :
+ROCM-CORE Library generated will be found in lib directory of the rocm-core package generated.
 
 ```shell
-$ readelf -d ./opt/rocm-6.4.0/lib/librocm-core.so.1.0.60400
+find . -name librocm-core.so.*
+```
 
-Dynamic section at offset 0x2de8 contains 27 entries:
-  Tag        Type                         Name/Value
- 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
- 0x000000000000000e (SONAME)             Library soname: [librocm-core.so.1]
- 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN]
- 0x000000000000000c (INIT)               0x1000
- 0x000000000000000d (FINI)               0x15f0
- 0x0000000000000019 (INIT_ARRAY)         0x3dd8
- 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
- 0x000000000000001a (FINI_ARRAY)         0x3de0
- 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
- 0x000000006ffffef5 (GNU_HASH)           0x2f0
- 0x0000000000000005 (STRTAB)             0x590
- 0x0000000000000006 (SYMTAB)             0x320
- 0x000000000000000a (STRSZ)              384 (bytes)
- 0x000000000000000b (SYMENT)             24 (bytes)
- 0x0000000000000003 (PLTGOT)             0x4000
- 0x0000000000000002 (PLTRELSZ)           408 (bytes)
- 0x0000000000000014 (PLTREL)             RELA
- 0x0000000000000017 (JMPREL)             0x868
- 0x0000000000000007 (RELA)               0x7a8
- 0x0000000000000008 (RELASZ)             192 (bytes)
- 0x0000000000000009 (RELAENT)            24 (bytes)
- 0x000000006ffffffb (FLAGS_1)            Flags: NODELETE
- 0x000000006ffffffe (VERNEED)            0x748
- 0x000000006fffffff (VERNEEDNUM)         1
- 0x000000006ffffff0 (VERSYM)             0x710
- 0x000000006ffffff9 (RELACOUNT)          3
- 0x0000000000000000 (NULL)               0x0
+### Sample Usage of APIs provided by rocm-core Library
+#### Get ROCm Version
 
+For getting ROCm Version make use of getROCMVersion() API.
+Sample Usage Example as shown below.
+
+```shell
+//  Usage :
+ int mj=0,mn=0,p=0,ret=0;
+ ret=getROCMVersion(&mj,&mn,&p);
+ if(ret !=VerSuccess )  // error occured
 ```
 
