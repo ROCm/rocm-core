@@ -1,8 +1,12 @@
 # ROCM-CORE Introduction
 
-rocm-core is a utility which can be used to get ROCm release version. 
-It also provides the Lmod modules files for the ROCm release.
+ROCM-CORE is a package which can be used to get ROCm release version, get ROCm install path information etc.
+It is also important to note that ROCM-CORE takes the role as a base component on which all of ROCm can depend,
+to make it easy to remove all of ROCm with a package manager.
+
 getROCmVersion function provides the ROCm version. 
+
+It also provides an example Lmod modules files for the ROCm release.
 
 Lmod module files can be loaded with the following commands.
 ``` shell
@@ -48,12 +52,11 @@ Go to Root Directory, create a build directory:
 Next, configure CMake. Invoke cmake with the following variables define as deemed fit
 
 ```shell
-cmake -DCMAKE_CURRENT_BINARY_DIR=$PWD \
-      -DCMAKE_CURRENT_SOURCE_DIR=$PWD/../ \
-      -DCMAKE_VERBOSE_MAKEFILE=1 \
-      -DCMAKE_INSTALL_PREFIX=./ \
-      -DROCM_VERSION="6.4.0" \
-      ..
+cmake -S $PWD/../ -B . \
+    -DCMAKE_VERBOSE_MAKEFILE=1 \
+    -DCMAKE_INSTALL_PREFIX=./ \
+    -DROCM_VERSION="6.4.0" \
+    ..
 ```
 
 >[!NOTE]
@@ -62,16 +65,21 @@ cmake -DCMAKE_CURRENT_BINARY_DIR=$PWD \
 
 ### Install
 
+Once cmake configuration successfully completed, from the same build directory run build, install commands
+
 ```shell
-         make
-         make install
+cmake --build .
+cmake --install .
 ```
 
 ### Package Generated
 
+Once cmake configuration and build successfully completed from the same build directory trigger package generation
+
 ```shell
-         make package
+cpack
 ```
+
 After this the package "rocm-core_6.4.0.60400-crdnnh.15158~22.04_amd64.deb" will be generated accordingly
 The content of which will be the following :
 
