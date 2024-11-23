@@ -21,9 +21,11 @@ You can find sources and binaries in our [GitHub repository](https://github.com/
 
 ## Installing ROCM-CORE
 
-To install ROCM-CORE, you must first install these prerequisites:
-
+Before we proceed with how to install, take a look on prerequisites:
+* Refer [System Requirements](https://rocm.docs.amd.com/projects/install-on-linux/en/docs-6.2.2/reference/system-requirements.html#supported-gpus)
+* Refer [ROCm installation for Linux](https://rocm.docs.amd.com/projects/install-on-linux/en/docs-6.2.2/index.html)
 * A [ROCm](https://rocm.docs.amd.com/)-enabled platform
+* To be noted that ROCM-CORE library primarily depends on having the C library available for the respective platform.
 
 ### Installing with pre-built packages
 

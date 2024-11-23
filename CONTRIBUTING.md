@@ -64,12 +64,6 @@ All the code is formatted using `clang-format`. To format a file, use:
 clang-format-10 -style=file -i <path-to-source-file>
 ```
 
-To format the code per commit, you can install githooks:
-
-```shell
-./.githooks/install
-```
-
  
 ### Reporting Issues
 We use [GitHub Issues](https://github.com/ROCm/rocm-core/issues) to track public **bugs** and **enhancement requests**.
