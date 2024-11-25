@@ -70,8 +70,8 @@ cmake -S $PWD/../ -B . \
 Once cmake configuration successfully completed, from the same build directory run build, install commands
 
 ```shell
-cmake --build .
-cmake --install .
+cmake --build . --
+cmake --build . -- install
 ```
 
 ### Package Generated
@@ -79,7 +79,7 @@ cmake --install .
 Once cmake configuration and build successfully completed from the same build directory trigger package generation
 
 ```shell
-cpack
+cmake --build . -- package
 ```
 
 After this the package "rocm-core_6.4.0.60400-crdnnh.15158~22.04_amd64.deb" will be generated accordingly
@@ -157,7 +157,7 @@ find . -name librocm-core.so.*
 For getting ROCm Version make use of getROCMVersion() API.
 Sample Usage Example as shown below.
 
-```shell
+```C
 //  Usage :
  int mj=0,mn=0,p=0,ret=0;
  ret=getROCMVersion(&mj,&mn,&p);
