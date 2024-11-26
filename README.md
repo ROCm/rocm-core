@@ -21,7 +21,10 @@ You can find sources and binaries in our [GitHub repository](https://github.com/
 
 ## Installing ROCM-CORE
 
-Before we proceed with how to install, take a look on prerequisites:
+Before we proceed with how to install, take a look on references given below  to understand System requirements, ROCm Installation prerequisites, ROCm package repository set up etc.
+
+### Prerequisite References
+
 * Refer [System Requirements](https://rocm.docs.amd.com/projects/install-on-linux/en/docs-6.2.2/reference/system-requirements.html#supported-gpus)
 * Refer [ROCm installation for Linux](https://rocm.docs.amd.com/projects/install-on-linux/en/docs-6.2.2/index.html)
 * A [ROCm](https://rocm.docs.amd.com/)-enabled platform
@@ -64,6 +67,13 @@ cmake -S $PWD/../ -B . \
 >[!NOTE]
 >When specifying the path for the `CMAKE_PREFIX_PATH` variable, **do not** use the tilde (`~`)
 >shorthand to represent the home directory.
+### Setting up install locations
+By default, the install location is set to `/opt/rocm`. You can change this using
+`CMAKE_INSTALL_PREFIX`:
+```shell
+cmake -DCMAKE_INSTALL_PREFIX=<rocm-core-install-path> ..
+```
+where rocm-core-install-path is "./" in the cmake configure command shared above.
 
 ### Install
 
@@ -134,14 +144,6 @@ drwxr-xr-x root/root         0 2024-11-22 10:37 ./opt/rocm-6.4.0/share/doc/rocm-
 
 ```
 
-### Setting up locations
-
-By default, the install location is set to `/opt/rocm`. You can change this using
-`CMAKE_INSTALL_PREFIX`:
-
-```shell
-cmake -DCMAKE_INSTALL_PREFIX=<rocm-core-install-path> ..
-```
 
 ## ROCM-CORE Library
 
