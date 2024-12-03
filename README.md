@@ -77,7 +77,7 @@ where rocm-core-install-path is "./" in the cmake configure command shared above
 
 ### Install
 
-Once cmake configuration successfully completed, from the same build directory run build, install commands
+Once cmake configuration successfully completed, from the same build directory run build, install targets
 
 ```shell
 cmake --build . --
@@ -92,10 +92,10 @@ Once cmake configuration and build successfully completed from the same build di
 cmake --build . -- package
 ```
 
-After this the package "rocm-core_6.4.0.60400-crdnnh.15158~22.04_amd64.deb" will be generated accordingly
-The content of which will be the following :
+Once successfull execution of above command "rocm-core" RPM/DEBIAN packages will be generated  (ex:rocm-core_6.4.0.60400-22.04_amd64.deb, rocm-core-6.4.0.60400-x86_64.rpm). The contents of the "rocm-core" package will include the following files:
 
 ```shell
+Debian Package Sample:
 $ dpkg -I rocm-core_6.4.0.60400-crdnnh.15158~22.04_amd64.deb
  new debian package, version 2.0.
  size 13986 bytes: control archive=2083 bytes.
@@ -141,6 +141,55 @@ drwxr-xr-x root/root         0 2024-11-22 10:37 ./opt/rocm-6.4.0/share/doc/
 drwxr-xr-x root/root         0 2024-11-22 10:37 ./opt/rocm-6.4.0/share/doc/rocm-core/
 -rw-r--r-- root/root      1113 2024-11-22 10:34 ./opt/rocm-6.4.0/share/doc/rocm-core/LICENSE.txt
 
+RPM Package Sample:
+$ rpm -qip rocm-core-6.4.0.60400-crdnnh.15158.el8.x86_64.rpm
+Name        : rocm-core
+Version     : 6.4.0.60400
+Release     : crdnnh.15158.el8
+Architecture: x86_64
+Install Date: (not installed)
+Group       : unknown
+Size        : 37096
+License     : MIT
+Signature   : (none)
+Source RPM  : rocm-core-6.4.0.60400-crdnnh.15158.el8.src.rpm
+Build Date  : Fri 22 Nov 2024 10:41:01 AM PST
+Build Host  : 514dbdf6c195
+Relocations : /opt/rocm-6.4.0
+Vendor      : Advanced Micro Devices, Inc.
+Summary     : Radeon Open Compute (ROCm) Runtime software stack
+Description :
+DESCRIPTION
+===========
+
+This is an installer created using CPack (https://cmake.org). No additional installation instructions provided.
+$ rpm -qlp rocm-core-6.4.0.60400-crdnnh.15158.el8.x86_64.rpm
+/opt/rocm-6.4.0
+/opt/rocm-6.4.0/.info
+/opt/rocm-6.4.0/.info/version
+/opt/rocm-6.4.0/include
+/opt/rocm-6.4.0/include/rocm-core
+/opt/rocm-6.4.0/include/rocm-core/rocm_getpath.h
+/opt/rocm-6.4.0/include/rocm-core/rocm_version.h
+/opt/rocm-6.4.0/lib
+/opt/rocm-6.4.0/lib/cmake
+/opt/rocm-6.4.0/lib/cmake/rocm-core
+/opt/rocm-6.4.0/lib/cmake/rocm-core/rocm-core-config-version.cmake
+/opt/rocm-6.4.0/lib/cmake/rocm-core/rocm-core-config.cmake
+/opt/rocm-6.4.0/lib/cmake/rocm-core/rocmCoreTargets-release.cmake
+/opt/rocm-6.4.0/lib/cmake/rocm-core/rocmCoreTargets.cmake
+/opt/rocm-6.4.0/lib/librocm-core.so
+/opt/rocm-6.4.0/lib/librocm-core.so.1
+/opt/rocm-6.4.0/lib/librocm-core.so.1.0.60400
+/opt/rocm-6.4.0/lib/rocmmod
+/opt/rocm-6.4.0/libexec
+/opt/rocm-6.4.0/libexec/rocm-core
+/opt/rocm-6.4.0/libexec/rocm-core/runpath_to_rpath.py
+/opt/rocm-6.4.0/share
+/opt/rocm-6.4.0/share/doc
+/opt/rocm-6.4.0/share/doc/rocm-core
+/opt/rocm-6.4.0/share/doc/rocm-core/LICENSE.txt
+
 
 ```
 
@@ -150,7 +199,7 @@ drwxr-xr-x root/root         0 2024-11-22 10:37 ./opt/rocm-6.4.0/share/doc/rocm-
 ROCM-CORE Library generated will be found in lib directory of the rocm-core package generated.
 
 ```shell
-find . -name librocm-core.so.*
+find . -name "librocm-core.so.*"
 ```
 
 ### Sample Usage of APIs provided by rocm-core Library
