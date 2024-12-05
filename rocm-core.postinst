@@ -36,7 +36,7 @@ do_update_alternatives(){
     # Update the /opt/rocm symlink
     # For custom location installation of rpm package, /opt/rocm symlink is not required
     # TBD: For custom location installation of deb package.
-    if [[ "$DISTRIB_ID" == "Ubuntu" ]] || [[ "$RPM_INSTALL_PREFIX0" == "/opt/rocm-"* ]] ; then
+    if [[ ${ID_LIKE:-$ID} == "debian" ]] || [[ "$RPM_INSTALL_PREFIX0" == "/opt/rocm-"* ]] ; then
         update-alternatives --install "/opt/rocm" "rocm" "@CPACK_PACKAGING_INSTALL_PREFIX@" "$altscore"
     fi
 
@@ -45,7 +45,7 @@ do_update_alternatives(){
        if [ -d "$loc" ]
        then
            mkdir -p "$loc/rocm"
-           if [[ "$DISTRIB_ID" == "Ubuntu" ]] ; then
+           if [[ ${ID_LIKE:-$ID} == "debian" ]] ; then
                update-alternatives --install "$loc/rocm/@ROCM_VERSION@" "rocmmod@ROCM_VERSION@" "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/rocmmod" "$altscore"
            else
                update-alternatives --install "$loc/rocm/@ROCM_VERSION@" "rocmmod@ROCM_VERSION@" "$RPM_INSTALL_PREFIX0/@CMAKE_INSTALL_LIBDIR@/rocmmod" "$altscore"
@@ -56,7 +56,7 @@ do_update_alternatives(){
     true
 }
 
-if [ -e /etc/lsb-release ] && source /etc/lsb-release && [ "$DISTRIB_ID" = "Ubuntu" ]
+if [ -e /etc/os-release ] && source /etc/os-release && [[ ${ID_LIKE:-$ID} == "debian" ]]
 then
     case "$1" in
        (configure)
