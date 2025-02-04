@@ -104,8 +104,8 @@ $ dpkg -I rocm-core_6.4.0.60400-crdnnh.15158~22.04_amd64.deb
     2871 bytes,    75 lines   *  postinst             #!/bin/bash
      873 bytes,    32 lines   *  prerm                #!/bin/bash
  Architecture: amd64
- Description: Radeon Open Compute (ROCm) Runtime software stack
- Homepage: https://github.com/RadeonOpenCompute/ROCm
+ Description: ROCm Runtime software stack
+ Homepage: https://github.com/ROCm/rocm-core
  Maintainer: ROCm Dev Support <rocm-dev.support@amd.com>
  Package: rocm-core
  Priority: optional
@@ -157,7 +157,7 @@ Build Date  : Fri 22 Nov 2024 10:41:01 AM PST
 Build Host  : 514dbdf6c195
 Relocations : /opt/rocm-6.4.0
 Vendor      : Advanced Micro Devices, Inc.
-Summary     : Radeon Open Compute (ROCm) Runtime software stack
+Summary     : ROCm Runtime software stack
 Description :
 DESCRIPTION
 ===========
