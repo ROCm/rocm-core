@@ -74,8 +74,12 @@ else ()
 endif()
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocmmod.in ${BUILD_DIR}/rocmmod @ONLY )
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm-core.postinst ${BUILD_DIR}/postinst @ONLY )
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm-core.prerm ${BUILD_DIR}/prerm @ONLY )
+
+# Setting Permission 0755 for pre/post install scripts
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm-core.postinst ${BUILD_DIR}/postinst
+	 FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE @ONLY )
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm-core.prerm ${BUILD_DIR}/prerm
+	 FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE @ONLY )
 
 #Generate BUILD_INFO
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/rocm_version.h.in ${BUILD_DIR}/rocm_version.h @ONLY )
