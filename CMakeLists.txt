@@ -148,7 +148,7 @@ if(BUILD_SHARED_LIBS)
   # License file
   install ( FILES ${LICENSE_FILE}
             DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt
-            COMPONENT CORE_RUNTIME)
+            COMPONENT ${COMP_TYPE})
 else()
   install ( FILES ${BUILD_DIR}/version
             DESTINATION .info
