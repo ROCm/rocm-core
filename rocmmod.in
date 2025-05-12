@@ -3,15 +3,16 @@
 ## Rocm module
 ##
 
-module-whatis   "adds `@CPACK_PACKAGING_INSTALL_PREFIX@/bin' to your PATH environment variable"
+module-whatis   "Adds ROCm binary paths to your environment variable"
 
 proc ModulesHelp { } {
     puts stderr "\tThe ROCM Module."
 }
 
+set ROOT [file normalize [file dirname [file normalize ${ModulesCurrentModulefile}/__]]/../..]
 
-prepend-path PATH "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@:@CPACK_PACKAGING_INSTALL_PREFIX@/llvm/bin"
-prepend-path MANPATH "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_MANDIR@:@CPACK_PACKAGING_INSTALL_PREFIX@/llvm/share/man1"
-prepend-path CMAKE_PREFIX_PATH "@CPACK_PACKAGING_INSTALL_PREFIX@"
-setenv ROCM_PATH "@CPACK_PACKAGING_INSTALL_PREFIX@"
-setenv HIP_PATH "@CPACK_PACKAGING_INSTALL_PREFIX@"
+prepend-path PATH "${ROOT}/@CMAKE_INSTALL_BINDIR@:${ROOT}/lib/llvm/bin"
+prepend-path MANPATH "${ROOT}/@CMAKE_INSTALL_MANDIR@:${ROOT}/lib/llvm/share/man1"
+prepend-path CMAKE_PREFIX_PATH "${ROOT}"
+setenv ROCM_PATH "${ROOT}"
+setenv HIP_PATH "${ROOT}"
