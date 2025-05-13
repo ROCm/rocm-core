@@ -37,9 +37,27 @@ set( CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options ar
 
 ## Verbose output.
 set( CMAKE_VERBOSE_MAKEFILE on )
+include( GNUInstallDirs )
+
+if(ENABLE_ASAN_PACKAGING)
+  # Only libraries required for ASAN Package
+  set( CPACK_COMPONENTS_ALL CORE_ASAN )
+  set( COMP_TYPE "CORE_ASAN" )
+  set( PKG_DESCRIPTION "ROCm AddressSanitizer Instrumented Runtime software stack" )
+  set( CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DOCDIR}-asan" )
+else()
+  if(BUILD_SHARED_LIBS)
+    set( CPACK_COMPONENTS_ALL CORE_RUNTIME )
+    set( COMP_TYPE "CORE_RUNTIME" )
+    set( PKG_DESCRIPTION "ROCm Runtime software stack" )
+  else()
+    set( CPACK_COMPONENTS_ALL CORE_STATIC )
+    set( STATIC_COMP_TYPE "CORE_STATIC" )
+    set( PKG_DESCRIPTION "ROCm Static software stack" )
+  endif()
+endif()
 
 include( utils.cmake )
-include( GNUInstallDirs )
 
 #Parse Version
 message( STATUS "ROCM_VERSION = ${ROCM_VERSION}" )
@@ -127,23 +145,6 @@ set( SO_VERSION_STRING "${SO_MAJOR}.${SO_MINOR}.${ROCM_LIBPATCH_VERSION}" )
 set_property( TARGET ${CORE_TARGET} PROPERTY VERSION "${SO_VERSION_STRING}" )
 set_property( TARGET ${CORE_TARGET} PROPERTY SOVERSION "${SO_MAJOR}" )
 
-if(ENABLE_ASAN_PACKAGING)
-  # Only libraries required for ASAN Package
-  set( CPACK_COMPONENTS_ALL CORE_ASAN )
-  set( COMP_TYPE "CORE_ASAN" )
-  set( PKG_DESCRIPTION "ROCm AddressSanitizer Instrumented Runtime software stack" )
-else()
-  if(BUILD_SHARED_LIBS)
-    set( CPACK_COMPONENTS_ALL CORE_RUNTIME )
-    set( COMP_TYPE "CORE_RUNTIME" )
-    set( PKG_DESCRIPTION "ROCm Runtime software stack" )
-  else()
-    set( CPACK_COMPONENTS_ALL CORE_STATIC )
-    set( STATIC_COMP_TYPE "CORE_STATIC" )
-    set( PKG_DESCRIPTION "ROCm Static software stack" )
-  endif()
-endif()
-
 #Add the libpatch version if available to the version file
 if( DEFINED VERSION_POINT )
   file ( WRITE "${CMAKE_CURRENT_BINARY_DIR}/version" "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_POINT}-${BUILD_ID}\n" )
@@ -173,10 +174,7 @@ if(BUILD_SHARED_LIBS)
   # License file
   install ( FILES ${LICENSE_FILE}
             DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt
-            COMPONENT CORE_RUNTIME)
-  install ( FILES ${LICENSE_FILE} DESTINATION
-            ${CMAKE_INSTALL_DOCDIR}-asan RENAME LICENSE.txt
-            COMPONENT CORE_ASAN)
+            COMPONENT ${COMP_TYPE})
 else()
   install ( FILES ${BUILD_DIR}/version
             DESTINATION .info
@@ -270,7 +268,11 @@ message ( STATUS "Using CPACK_DEBIAN_PACKAGE_RELEASE ${CPACK_DEBIAN_PACKAGE_RELE
 set ( CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT" )
 
 # Debian specific packaging configuration
-configure_debian_pkg( ${CORE_TARGET} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${PKG_MAINTAINER_NM} ${PKG_MAINTAINER_EMAIL} )
+if(COMP_TYPE)
+  configure_debian_pkg( ${CORE_TARGET} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${PKG_MAINTAINER_NM} ${PKG_MAINTAINER_EMAIL} )
+elseif(STATIC_COMP_TYPE)
+  configure_debian_pkg( ${CORE_TARGET} ${STATIC_COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${PKG_MAINTAINER_NM} ${PKG_MAINTAINER_EMAIL} )
+endif()
 
 ## RPM package specific variables
 set ( CPACK_RPM_COMPONENT_INSTALL ON )
