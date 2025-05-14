@@ -1,6 +1,8 @@
 Change Logs for rocm-core
 
-Unreleased ROCm6.3.0 release
+ROCm6.4.1 release
+ - Added changelog.debian and copyright for debian packages.
+ROCm6.3.0 release
  - Enabled Support for CMAKE Module Config.
 ROCm6.1.0 release
  - Added new API to get ROCm install Path (getROCmInstallPath()) at runtime
