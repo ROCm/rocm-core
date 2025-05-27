@@ -66,12 +66,15 @@ parse_rocm_version( ${ROCM_VERSION} )
 set( CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm" CACHE PATH "default cpack directory" )
 set( BUILD_SHARED_LIBS ON CACHE BOOL "Build shared library (.so) or not." )
 set( CPACK_GENERATOR "TGZ;DEB;RPM" CACHE STRING "package types to be produced " )
-set( LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/copyright"  )
+set( LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/copyright" CACHE PATH "Path to License File in source dir" )
 set( BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR} )
 set( EXTENDED_PACKAGE_DESCRIPTION
      "ROCM-CORE is a package which can be used to get ROCm release version, get ROCm install path information etc.
      It is also important to note that ROCM-CORE takes the role as a base component on which all of ROCm can depend,
      to make it easy to remove all of ROCm with a package manager." CACHE STRING "Debian Package Extended Description")
+
+set( BUILD_ENABLE_LINTIAN_OVERRIDES OFF CACHE BOOL "Enable/Disable Lintian Overrides" )
+set( BUILD_DEBIAN_PKGING_FLAG OFF CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" )
 
 ## Set variables
 set_variables()
@@ -145,10 +148,6 @@ if(BUILD_SHARED_LIBS)
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT CORE_RUNTIME )
 
-  # License file
-  install ( FILES ${LICENSE_FILE}
-            DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt
-            COMPONENT ${COMP_TYPE})
 else()
   install ( FILES ${BUILD_DIR}/version
             DESTINATION .info
@@ -168,10 +167,6 @@ else()
   install ( FILES ${BUILD_DIR}/rocmmod
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT ${STATIC_COMP_TYPE} )
-  # License file
-  install ( FILES ${LICENSE_FILE}
-            DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt
-            COMPONENT ${STATIC_COMP_TYPE})
 endif()
 
 ## Cmake module config file configurations
@@ -243,9 +238,9 @@ set ( CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT" )
 
 # Debian specific packaging configuration
 if(COMP_TYPE)
-configure_debian_pkg( ${CORE_TARGET} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${PKG_MAINTAINER_NM} ${PKG_MAINTAINER_EMAIL} )
+  configure_debian_pkg( ${CORE_TARGET} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${PKG_MAINTAINER_NM} ${PKG_MAINTAINER_EMAIL} )
 elseif(STATIC_COMP_TYPE)
-configure_debian_pkg( ${CORE_TARGET} ${STATIC_COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${PKG_MAINTAINER_NM} ${PKG_MAINTAINER_EMAIL} )
+  configure_debian_pkg( ${CORE_TARGET} ${STATIC_COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${PKG_MAINTAINER_NM} ${PKG_MAINTAINER_EMAIL} )
 endif()
 
 ## RPM package specific variables
@@ -297,6 +292,20 @@ endif()
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_REPLACES "rocm-clang-ocl")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONFLICTS "rocm-clang-ocl")
 set(CPACK_RPM_RUNTIME_PACKAGE_OBSOLETES "rocm-clang-ocl")
+
+# Custom installation for Debian Lintian File
+if( BUILD_ENABLE_LINTIAN_OVERRIDES STREQUAL "ON" AND BUILD_DEBIAN_PKGING_FLAG STREQUAL "ON")
+    set( OVERRIDE_FILE "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_OVERRIDES_INSTALL_FILENM}" )
+    if(COMP_TYPE)
+	set( OVERRIDE_TEMP_INSTALL_LOC "/_CPack_Packages/Linux/DEB/${CORE_TARGET}-${CPACK_PACKAGE_VERSION}-Linux/${COMP_TYPE}" )
+    elseif(STATIC_COMP_TYPE)
+	set( OVERRIDE_TEMP_INSTALL_LOC "/_CPack_Packages/Linux/DEB/${CORE_TARGET}-${CPACK_PACKAGE_VERSION}-Linux/${STATIC_COMP_TYPE}" )
+    endif()
+    set(CPACK_INSTALL_COMMANDS
+	  "${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}${OVERRIDE_TEMP_INSTALL_LOC}${DEB_OVERRIDES_INSTALL_PATH}"
+	  "${CMAKE_COMMAND} -E copy ${OVERRIDE_FILE} ${CMAKE_BINARY_DIR}${OVERRIDE_TEMP_INSTALL_LOC}${DEB_OVERRIDES_INSTALL_PATH}"
+	  )
+endif()
 
 ## Include packaging
 include ( CPack )
