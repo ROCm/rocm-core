@@ -220,6 +220,7 @@ function( configure_debian_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T
         configure_file(
           "${CMAKE_SOURCE_DIR}/DEBIAN/overrides.in"
           "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_OVERRIDES_INSTALL_FILENM}"
+	   FILE_PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
           @ONLY
         )
       endif()
@@ -228,7 +229,7 @@ function( configure_debian_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T
       find_program ( DEB_GZIP_EXEC gzip )
       if(EXISTS "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian" )
         execute_process(
-          COMMAND ${DEB_GZIP_EXEC} -9 "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
+          COMMAND ${DEB_GZIP_EXEC} -n -9 "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
           WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/DEBIAN"
           RESULT_VARIABLE result
           OUTPUT_VARIABLE output

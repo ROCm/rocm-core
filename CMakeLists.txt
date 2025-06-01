@@ -69,9 +69,10 @@ set( CPACK_GENERATOR "TGZ;DEB;RPM" CACHE STRING "package types to be produced " 
 set( LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/copyright" CACHE PATH "Path to License File in source dir" )
 set( BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR} )
 set( EXTENDED_PACKAGE_DESCRIPTION
-     "ROCM-CORE is a package which can be used to get ROCm release version, get ROCm install path information etc.
-     It is also important to note that ROCM-CORE takes the role as a base component on which all of ROCm can depend,
-     to make it easy to remove all of ROCm with a package manager." CACHE STRING "Debian Package Extended Description")
+     "ROCM-CORE package helps to get ROCm release version,get install path.
+     It is also important to note that ROCM-CORE takes the role as a base
+     component on which all of ROCm can depend, to make it easy to remove
+     all of ROCm with a package manager." )
 
 set( BUILD_ENABLE_LINTIAN_OVERRIDES OFF CACHE BOOL "Enable/Disable Lintian Overrides" )
 set( BUILD_DEBIAN_PKGING_FLAG OFF CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" )
@@ -141,7 +142,7 @@ if(BUILD_SHARED_LIBS)
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rocm-core
             COMPONENT CORE_RUNTIME )
 
-  install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/runpath_to_rpath.py
+  install ( PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/runpath_to_rpath.py
             DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/rocm-core
             COMPONENT CORE_RUNTIME )
   install ( FILES ${BUILD_DIR}/rocmmod
@@ -263,10 +264,14 @@ endif()
 message(STATUS "Using CPACK_RPM_PACKAGE_RELEASE: ${CPACK_RPM_PACKAGE_RELEASE}")
 set ( CPACK_RPM_FILE_NAME "RPM-DEFAULT" )
 
+# Debian Lintian Fix - Add Dependency for Python Script delivered
+set( DEB_DEPENDS_STRING "python3, libc6 (>= 2.34)" )
+
 # Debian package specific variables
 set ( CPACK_DEBIAN_PACKAGE_DEPENDS ${DEB_DEPENDS_STRING} )
 set ( CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/ROCm/rocm-core" )
 set ( CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${BUILD_DIR}/postinst;${BUILD_DIR}/prerm" )
+set ( CPACK_DEBIAN_CORE_RUNTIME_PACKAGE_DEPENDS ${DEB_DEPENDS_STRING} )
 set ( CPACK_DEBIAN_CORE_ASAN_PACKAGE_DEPENDS ${CORE_TARGET} )
 set ( CPACK_DEBIAN_CORE_RUNTIME_PACKAGE_CONTROL_EXTRA "${CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA}" )
 set ( CPACK_DEBIAN_CORE_STATIC_PACKAGE_CONTROL_EXTRA "${CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA}" )
