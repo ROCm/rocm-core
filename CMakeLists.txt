@@ -268,7 +268,7 @@ set ( CPACK_RPM_FILE_NAME "RPM-DEFAULT" )
 set( CPACK_RPM_SPEC_MORE_DEFINE "\n%undefine __brp_mangle_shebangs")
 
 # Debian Lintian Fix - Add Dependency for Python Script delivered
-set( DEB_DEPENDS_STRING "python3, libc6 (>= 2.34)" )
+set( DEB_DEPENDS_STRING "python3, libc6" )
 
 # Debian package specific variables
 set ( CPACK_DEBIAN_PACKAGE_DEPENDS ${DEB_DEPENDS_STRING} )
