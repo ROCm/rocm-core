@@ -263,6 +263,9 @@ if ( PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "" )
 endif()
 message(STATUS "Using CPACK_RPM_PACKAGE_RELEASE: ${CPACK_RPM_PACKAGE_RELEASE}")
 set ( CPACK_RPM_FILE_NAME "RPM-DEFAULT" )
+# #!/usr/bin/env is converted to /usr/libexec/platform-python in some OS like RHEL
+# Prevent the modification of python interpreter directives in runpath_to_rpath.py
+set( CPACK_RPM_SPEC_MORE_DEFINE "\n%undefine __brp_mangle_shebangs")
 
 # Debian Lintian Fix - Add Dependency for Python Script delivered
 set( DEB_DEPENDS_STRING "python3, libc6 (>= 2.34)" )
